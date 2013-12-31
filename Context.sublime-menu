@@ -1,0 +1,6 @@
+[
+    {
+        "caption": "Run CSScomb",
+        "command": "css_comb"
+    }
+]

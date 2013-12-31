@@ -1,0 +1,17 @@
+{
+    // You must set those two variables to make the plugin work correctly.
+
+    // On Unix run from command-line: `echo $PATH`, on Windows: `echo %PATH%`.
+    // Copy the result here:
+    "PATH": "/usr/local/bin",
+
+    // On Unix run from command-line: `echo $NODE_PATH`, on Windows: `echo
+    // %NODE_PATH%`. Copy the result here:
+    "NODE_PATH": "/usr/local/lib/node_modules",
+
+    // If you want to use custom config, put file named `.csscomb.json` to the
+    // project's root or your HOME directory. If for some reason you would like
+    // to set custom path to configuration file, paste it here.
+    // For example, "/Users/csscomb/project/config/csscomb.json"
+    "custom_config_path": ""
+}
