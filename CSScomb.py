@@ -70,9 +70,9 @@ class CssCombCommand(sublime_plugin.TextCommand):
         }
 
     def get_setting(self, key):
-        settings = self.view.settings().get('CSScomb')
+        settings = self.view.settings().get('CSScomb JS')
         if settings is None:
-            settings = sublime.load_settings('CSScomb.sublime-settings')
+            settings = sublime.load_settings('CSScomb JS.sublime-settings')
         return settings.get(key)
 
     def get_syntax(self):

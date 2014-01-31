@@ -7,9 +7,9 @@ and consistent.
 
 WARNING: Make sure paths are set correctly in settings file:
 
-1.  Open default settings: `Preferences > Package Settings > CSScomb > Sort Order - Default`
+1.  Open default settings: `Preferences > Package Settings > CSScomb JS > Sort Order - Default`
 2.  Copy whole file content.
-3.  Open user-defined settings: `Preferences > Package Settings > CSScomb > Sort Order - User`
+3.  Open user-defined settings: `Preferences > Package Settings > CSScomb JS > Sort Order - User`
 4.  Paste in this file.
 5.  Follow instructions in file comments.
 
@@ -19,7 +19,7 @@ There are a number of ways to configure CSScomb:
 2.  Set path to config file in user settings:
     `{ "custom_config_path": "~/Sites/csscomb.json" }`
 3.  Set path in Sublime project settings:
-    `"CSScomb": { "custom_config_path": "~/Sites/.csscomb.json" },`
+    `"CSScomb JS": { "custom_config_path": "~/Sites/.csscomb.json" },`
 
 For more information read docs: https://github.com/csscomb/csscomb.js
 

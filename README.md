@@ -12,9 +12,9 @@ You need Node.js to make this plugin work.
   
 Make sure paths are set correctly in settings file:  
   
-1.  Open default settings: `Preferences > Package Settings > CSScomb > Sort Order - Default`  
+1.  Open default settings: `Preferences > Package Settings > CSScomb JS > Sort Order - Default`  
 2.  Copy whole file content.  
-3.  Open user-defined settings: `Preferences > Package Settings > CSScomb > Sort Order - User`  
+3.  Open user-defined settings: `Preferences > Package Settings > CSScomb JS > Sort Order - User`  
 4.  Paste in this file.  
 5.  Follow instructions in file comments.  
 
@@ -33,11 +33,11 @@ To use your own configuration file do one of the following:
 2.  Set path to config file in user settings:
     `{ "custom_config_path": "~/Sites/csscomb.json" }`
 3.  Set path in Sublime project settings:
-    `"CSScomb": { "custom_config_path": "~/Sites/.csscomb.json" },`
+    `"CSScomb JS": { "custom_config_path": "~/Sites/.csscomb.json" },`
 
 ## Issues & bugs
 
-[Plugin tracker](https://github.com/csscomb/csscomb-for-sublime)    
+[Plugin tracker](https://github.com/csscomb/csscombjs-for-sublime)    
 [CSScomb tracker](https://github.com/csscomb/csscomb.js/issues)
 
 ## Authors
