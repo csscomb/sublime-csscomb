@@ -1,0 +1,11 @@
+{
+    "expr"     : true,
+    "undef"    : true,
+    "predef"   : ["require", "exports", "module", "process", "describe", "it", "beforeEach", "afterEach"],
+    "boss"     : true,
+    "sub"      : true,
+    "supernew" : true,
+    "loopfunc" : true,
+    "onecase"  : true,
+    "quotmark" : "single"
+}

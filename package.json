@@ -2,7 +2,7 @@
   "name": "csscomb-for-sublime",
   "version": "0.0.1",
   "dependencies": {
-    "csscomb": "2.0.1"
+    "csscomb": "2.0.4"
   },
   "license": "MIT"
 }

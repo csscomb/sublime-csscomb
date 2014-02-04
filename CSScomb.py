@@ -64,10 +64,11 @@ class CssCombCommand(sublime_plugin.TextCommand):
         return self.get_config_path(config_path)
 
     def get_env(self):
-        return {
-            'PATH': self.get_setting('PATH'),
-            'NODE_PATH': self.get_setting('NODE_PATH')
-        }
+        env = None
+        if self.is_osx():
+            env = os.environ.copy()
+            env['PATH'] += ':/usr/local/bin'
+        return env
 
     def get_setting(self, key):
         settings = self.view.settings().get('CSScomb JS')
@@ -92,6 +93,9 @@ class CssCombCommand(sublime_plugin.TextCommand):
             if start != end:
                 return True
         return False
+
+    def is_osx(self):
+        return platform.system() == 'Darwin'
 
     def is_windows(self):
         return platform.system() == 'Windows'
