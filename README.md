@@ -1,39 +1,38 @@
-# CSScomb for Sublime Text 2 & 3
+# CSScomb for Sublime Text
 
 ## About
 
-CSScomb is a coding style formatter for CSS.  
+CSScomb is a coding style formatter for CSS.    
 You can easily write your own configuration to make your stylesheets beautiful
 and consistent.
 
 ## The Requirements
 
-You need Node.js to make this plugin work.  
-  
-Make sure paths are set correctly in settings file:  
-  
-1.  Open default settings: `Preferences > Package Settings > CSScomb JS > Sort Order - Default`  
-2.  Copy whole file content.  
-3.  Open user-defined settings: `Preferences > Package Settings > CSScomb JS > Sort Order - User`  
-4.  Paste in this file.  
-5.  Follow instructions in file comments.  
+You need Node.js to make this plugin work.
 
 ## Plugin usage
 
-Select code and press <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>c</kbd>  
-  
-Tip: Combine expand selection by indentation <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>j</kbd> with <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>c</kbd> to quickly  
-select all rules for current css selector and sort them with csscomb.
+Select code and press <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>c</kbd>    
+Or open "Tools" menu and select "Run CSScomb JS".
+
+Tip: Combine expand selection by indentation <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>j</kbd> with <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>c</kbd> to quickly select all rules for current css selector and sort them with csscomb.
 
 ## Custom configuration
 
-To use your own configuration file do one of the following:  
+Custom configuration is fun and simple: just put `.csscomb.json` file in the
+project root or your HOME directory.
 
-1.  Put `.csscomb.json` file in the project root or your HOME directory.
-2.  Set path to config file in user settings:
-    `{ "custom_config_path": "~/Sites/csscomb.json" }`
-3.  Set path in Sublime project settings:
-    `"CSScomb JS": { "custom_config_path": "~/Sites/.csscomb.json" },`
+You can read more about available options
+[in docs](https://github.com/csscomb/csscomb.js/blob/master/doc/options.md).
+
+If for some reason you would like to set custom path to configuration file,
+set it in plugin config:
+
+```
+    "custom_config_path": "Users/csscomb/project/config/csscomb.json"
+}
+```
+
 
 ## Issues & bugs
 
@@ -42,4 +41,5 @@ To use your own configuration file do one of the following:
 
 ## Authors
 
-Sublime plugin: [i-akhmadullin](https://github.com/i-akhmadullin)
+[@tonyganch](https://github.com/tonyganch)
+
