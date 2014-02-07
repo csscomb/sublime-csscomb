@@ -43,7 +43,8 @@ class CssCombCommand(sublime_plugin.TextCommand):
                 stdout=PIPE, stdin=PIPE, stderr=PIPE,
                 env=self.get_env(), shell=self.is_windows())
         except OSError:
-            raise Exception('Couldn\'t find Node.js. Make sure it\'s in your $PATH by running `node -v` in your command-line.')
+            raise Exception("Couldn't find Node.js. Make sure it's in your " +
+                            '$PATH by running `node -v` in your command-line.')
         stdout, stderr = p.communicate(input=css.encode('utf-8'))
         if stdout:
             return stdout.decode('utf-8')
@@ -57,7 +58,9 @@ class CssCombCommand(sublime_plugin.TextCommand):
         if os.path.exists(config_path):
             return config_path
 
-        if os.path.dirname(config_path) == os.path.expanduser('~'):
+        parent_dir = os.path.dirname(config_path)
+        if os.path.dirname(config_path) in (os.path.expanduser('~'),
+                                            os.path.dirname(parent_dir)):
             return ''
 
         config_path = os.path.dirname(os.path.dirname(config_path)) + '/.csscomb.json'
