@@ -20,7 +20,7 @@ Tip: Combine expand selection by indentation <kbd>ctrl</kbd>+<kbd>shift</kbd>+<k
 ## Custom configuration
 
 Custom configuration is fun and simple: just put `.csscomb.json` file in the
-project root or your HOME directory.
+project root or your `HOME` directory.
 
 You can read more about available options
 [in docs](https://github.com/csscomb/csscomb.js/blob/master/doc/options.md).
@@ -29,6 +29,7 @@ If for some reason you would like to set custom path to configuration file,
 set it in plugin config:
 
 ```
+{
     "custom_config_path": "Users/csscomb/project/config/csscomb.json"
 }
 ```
@@ -36,7 +37,7 @@ set it in plugin config:
 
 ## Issues & bugs
 
-[Plugin tracker](https://github.com/csscomb/csscombjs-for-sublime)    
+[Plugin tracker](https://github.com/csscomb/sublime-csscomb/issues)    
 [CSScomb tracker](https://github.com/csscomb/csscomb.js/issues)
 
 ## Authors
