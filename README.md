@@ -34,6 +34,9 @@ set it in plugin config:
 }
 ```
 
+## Caveats
+
+If node has been installed with NVM you need to make a symlink to node in `/usr/local/bin`.  Using OS X, the binary path would typically be `/Users/[your name]/.nvm/[node version]/bin/node`.
 
 ## Issues & bugs
 
