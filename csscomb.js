@@ -17,10 +17,10 @@ process.stdin.on('end', function () {
     if (configPath) {
         config = require(configPath);
     } else {
-        config = comb.getConfig('csscomb');
+        config = Comb.getConfig('csscomb');
     }
 
-    combed = comb.configure(config).processString(str, syntax);
+    combed = comb.configure(config).processString(str, {syntax: syntax});
     process.stdout.write(combed);
 });
 

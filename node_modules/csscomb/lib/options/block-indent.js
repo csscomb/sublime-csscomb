@@ -1,103 +1,121 @@
-module.exports = {
+module.exports = (function() {
+    function processStylesheet(node) {
+        var spaces;
+        var whitespaceNode;
+        var i;
 
-    /**
-     * Sets handler value.
-     *
-     * @param {String|Number} value Option value
-     * @returns {Object|undefined}
-     */
-    setValue: function(value) {
-        delete this._value;
+        for (i = node.length; i--;) {
+            whitespaceNode = node[i];
 
-        if (typeof value === 'number' && value === Math.abs(Math.round(value))) {
-            this._value = new Array(value + 1).join(' ');
-        } else if (typeof value === 'string' && value.match(/^[ \t]+$/)) {
-            this._value = value;
-        }
+            if (whitespaceNode[0] !== 's') continue;
 
-        if (typeof this._value === 'string') return this;
-    },
+            spaces = whitespaceNode[1].replace(/\n[ \t]+/gm, '\n');
 
-    /**
-     * Processes tree node.
-     * @param {String} nodeType
-     * @param {node} node
-     */
-    process: function(nodeType, node, level) {
-        var value;
-        var space;
-
-        // Add right space before closing brace
-        if (nodeType === 'atrulers' || nodeType === 'block') {
-            value = '\n' + new Array(level + 1).join(this._value);
-            if (node[node.length - 1][0] === 's') node.pop();
-            node.push(['s', value]);
-        }
-
-        // Add right space before rule declaration
-        if (nodeType === 'stylesheet' || nodeType === 'atrulers') {
-            // Level up hack
-            if (nodeType === 'atrulers') level++;
-
-            // Prevent line break at file start
-            var isFirst;
-            if (nodeType === 'stylesheet') {
-                var first = node[0];
-                if (first[0] !== 's' || first[1].match('\n') === null) isFirst = true;
+            if (spaces === '') {
+                node.splice(i, 1);
+            } else {
+                whitespaceNode[1] = spaces;
             }
-
-            for (var i = 0; i < node.length; i++) {
-                var nodeItem = node[i];
-                if (nodeItem[0] === 'atruler' || nodeItem[0] === 'ruleset') {
-                    value = (i < 2 && isFirst ? '' : '\n') + new Array(level + 1).join(this._value);
-                    isFirst = false;
-
-                    space = node[i - 1];
-                    if (!space || space[0] !== 's') {
-                        var tail = node.splice(i);
-                        space = ['s', ''];
-                        tail.unshift(space);
-                        Array.prototype.push.apply(node, tail);
-                        i++;
-                    }
-                    space[1] = space[1].replace(/(\n)?([\t ]+)?$/, value);
-                }
-            }
-        }
-
-        // Add space before block opening brace
-        if (nodeType === 'simpleselector') {
-            space = node[node.length - 1];
-            if (space[0] === 's' && space[1].match('\n')) {
-                space[1] += new Array(level + 1).join(this._value);
-            }
-        }
-    },
-
-    /**
-     * Detects the value of an option at the tree node.
-     *
-     * @param {String} nodeType
-     * @param {node} node
-     */
-    detect: function(nodeType, node, level) {
-        var result = null;
-        if (nodeType === 'atrulers' || nodeType === 'block') {
-            if (node.length && node[node.length - 1][0] === 's' && level > 0) {
-                result = node[node.length - 1][1].replace(/\s*\n/g, '');
-
-                if (this._prev !== undefined && this._prev[0] < level) {
-                    result = result.replace(result.replace(this._prev[1], ''), '');
-                }
-                if (this._prev === undefined || this._prev[0] !== level) {
-                    this._prev = [level, result];
-                }
-            }
-        }
-
-        if (result !== null) {
-            return result;
         }
     }
 
-};
+    function processSassBlock(node, level, value) {
+        var spaces;
+        var whitespaceNode;
+        var i;
+
+        for (i = node.length; i--;) {
+            whitespaceNode = node[i];
+
+            if (whitespaceNode[0] !== 's') continue;
+
+            if (whitespaceNode[1] === '\n') continue;
+
+            spaces = whitespaceNode[1].replace(/[ \t]/gm, '');
+            spaces += new Array(level + 2).join(value);
+            whitespaceNode[1] = spaces;
+        }
+    }
+
+    function processSpaceNode(node, level, value) {
+        var spaces;
+
+        // Remove all whitespaces and tabs, leave only new lines:
+        spaces = node[0].replace(/[ \t]/gm, '');
+
+        if (!spaces) return;
+
+        spaces += new Array(level + 1).join(value);
+        node[0] = spaces;
+    }
+
+    return {
+        name: 'block-indent',
+
+        runBefore: 'sort-order',
+
+        syntax: ['css', 'less', 'sass', 'scss'],
+
+        accepts: {
+            number: true,
+            string: /^[ \t]*$/
+        },
+
+        /**
+         * Processes tree node.
+         *
+         * @param {String} nodeType
+         * @param {node} node
+         * @param {Number} level
+         */
+        process: function process(nodeType, node, level) {
+            var syntax = this.getSyntax();
+            var value = this.getValue('block-indent');
+
+            if (nodeType === 'stylesheet') {
+                return processStylesheet(node);
+            }
+
+            if (syntax === 'sass' && nodeType === 'block') {
+                return processSassBlock(node, level, value);
+            }
+
+            // Continue only with space nodes inside {...}:
+            if (syntax !== 'sass' && level !== 0 && nodeType === 's') {
+                processSpaceNode(node, level, value);
+            }
+        },
+
+        /**
+         * Detects the value of an option at the tree node.
+         *
+         * @param {String} nodeType
+         * @param {node} node
+         * @param {Number} level
+         */
+        detect: function(nodeType, node, level) {
+            var result = [];
+
+            // Continue only with non-empty {...} blocks:
+            if (nodeType !== 'atrulers' && nodeType !== 'block' || !node.length) return;
+
+            for (var i = node.length; i--;) {
+                var whitespaceNode = node[i];
+                if (whitespaceNode[0] !== 's') continue;
+
+                var spaces = whitespaceNode[1];
+                var lastIndex = spaces.lastIndexOf('\n');
+
+                // Do not continue if there is no line break:
+                if (lastIndex < 0) continue;
+
+                // Number of spaces from beginning of line:
+                var spacesLength = spaces.slice(lastIndex + 1).length;
+                var arrayLength = Math.floor(spacesLength / (level + 1)) + 1;
+                result.push(new Array(arrayLength).join(' '));
+            }
+
+            return result;
+        }
+    };
+})();

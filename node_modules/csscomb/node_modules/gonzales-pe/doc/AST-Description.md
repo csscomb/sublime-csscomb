@@ -588,20 +588,7 @@ For less:
 
 #### interpolatedVariable
 
-Interpolated variable.
-
-For scss and sass:
-
-```
-#{$nani}
-
-↓
-
-['interpolatedVariable',
-  ['ident', 'nani']]
-```
-
-For less:
+Valid only for less.
 
 ```
 @{nani}
@@ -611,6 +598,23 @@ For less:
 ['interpolatedVariable',
   ['ident', 'nani']]
 ```
+
+#### interpolation
+
+Interpolated expression
+
+Valid only for scss and sass.
+
+```
+#{$nani}
+
+↓
+
+['interpolation',
+  ['variable',
+    ['ident', 'nani']]]
+```
+
 
 #### loop
 

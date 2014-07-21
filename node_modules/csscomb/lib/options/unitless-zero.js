@@ -1,17 +1,9 @@
 module.exports = {
+    name: 'unitless-zero',
 
-    /**
-     * Sets handler value.
-     *
-     * @param {Boolean} value Option value
-     * @returns {Object|undefined}
-     */
-    setValue: function(value) {
-        if (value === true) {
-            this._value = value;
-            return this;
-        }
-    },
+    syntax: ['css', 'less', 'sass', 'scss'],
+
+    accepts: { boolean: [true] },
 
     /**
      * Processes tree node.

@@ -1,17 +1,9 @@
 module.exports = {
+    name: 'always-semicolon',
 
-    /**
-     * Sets handler value.
-     *
-     * @param {String|Boolean} value Option value
-     * @returns {Object|undefined}
-     * TODO: This option accepts only boolean
-     */
-    setValue: function(value) {
-        this._value = value === true;
-        if (!this._value) return;
-        return this;
-    },
+    syntax: ['css', 'less', 'sass', 'scss'],
+
+    accepts: { boolean: [true] },
 
     /**
      * Processes tree node.

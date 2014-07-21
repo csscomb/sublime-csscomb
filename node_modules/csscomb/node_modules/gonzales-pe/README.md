@@ -48,6 +48,23 @@ You can learn more about available methods on [Gonzales usage](doc/Gonzales-Usag
 
 AST is described on [Gonzales AST description](doc/AST-Description.md) page.
 
+You can also invoke gonzales via a shell command (if you globally install it via `npm install gonzales-pe -g`)
+
+```
+gonzales myFile.css
+```
+
+Outputs the AST for that file. Example output:
+
+```
+['stylesheet',
+  ['atrules',
+    ['atkeyword',
+      ['ident', 'import']],
+    ['s', '
+']]]
+```
+
 ## Test
 
 To run tests:

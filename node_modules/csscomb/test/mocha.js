@@ -17,6 +17,7 @@ if (process.env.TEST_COV) mocha.reporter('html-cov');
 
 // Add helpers (see tests for usage examples):
 mocha.suite.beforeEach(function() {
+    this.Comb = Comb;
     this.comb = new Comb();
     this.filename = '';
 
@@ -47,7 +48,7 @@ mocha.suite.beforeEach(function() {
         var syntax = input.split('.').pop();
         input = this.readFile(input);
         expected = expected ? this.readFile(expected) : input;
-        assert.equal(this.comb.processString(input, syntax), expected);
+        assert.equal(this.comb.processString(input, { syntax: syntax }), expected);
     };
 
     /**
@@ -78,7 +79,7 @@ mocha.suite.beforeEach(function() {
             return sorted;
         }
         assert.equal(
-            JSON.stringify(sortObject(this.comb.detectInString(input, options))),
+            JSON.stringify(sortObject(Comb.detectInString(input, options))),
             JSON.stringify(sortObject(expected))
         );
     };

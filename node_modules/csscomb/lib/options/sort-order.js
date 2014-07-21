@@ -1,29 +1,34 @@
 module.exports = {
+    name: 'sort-order',
+
+    runBefore: 'space-before-closing-brace',
+
+    syntax: ['css', 'less', 'sass', 'scss'],
 
     /**
      * Sets handler value.
      *
      * @param {Array} value Option value
-     * @returns {Object|undefined}
+     * @returns {Array}
      */
     setValue: function(value) {
-        if (!value) return;
+        if (!Array.isArray(value)) throw new Error('The option accepts only array of properties.');
 
-        this._order = {};
+        var order = {};
 
         if (typeof value[0] === 'string') {
             value.forEach(function(prop, propIndex) {
-                this._order[prop] = { group: 0, prop: propIndex };
-            }, this);
+                order[prop] = { group: 0, prop: propIndex };
+            });
         } else {
             value.forEach(function(group, groupIndex) {
                 group.forEach(function(prop, propIndex) {
-                    this._order[prop] = { group: groupIndex, prop: propIndex };
-                }, this);
-            }, this);
+                    order[prop] = { group: groupIndex, prop: propIndex };
+                });
+            });
         }
 
-        return this;
+        return order;
     },
 
     /**
@@ -32,6 +37,7 @@ module.exports = {
      * @param {node} node
      */
     process: function(nodeType, node) {
+        var _this = this;
         // Types of nodes that can be sorted:
         var NODES = ['atruleb', 'atruler', 'atrules', 'commentML', 'commentSL',
             'declaration', 's', 'include'];
@@ -40,7 +46,8 @@ module.exports = {
 
         var currentNode;
         // Sort order of properties:
-        var order = this._order;
+        var order = this.getValue('sort-order');
+        var syntax = this.getSyntax();
         // List of declarations that should be sorted:
         var sorted = [];
         // list of nodes that should be removed from parent node:
@@ -50,6 +57,10 @@ module.exports = {
         // Value to search in sort order: either a declaration's property name
         // (e.g. `color`), or @-rule's special keyword (e.g. `$import`):
         var propertyName;
+
+        // Index to place the nodes that shouldn't be sorted
+        var lastGroupIndex = order['...'] ? order['...'].group : Infinity;
+        var lastPropertyIndex = order['...'] ? order['...'].prop : Infinity;
 
         // Counters for loops:
         var i;
@@ -166,19 +177,29 @@ module.exports = {
                 i: i,
                 node: currentNode,
                 sc0: sc0,
+                sc1: [],
+                sc2: [],
                 delim: []
             };
 
             // If the declaration's property is in order's list, save its
             // group and property indices. Otherwise set them to 10000, so
             // declaration appears at the bottom of a sorted list:
+
             extendedNode.groupIndex = orderProperty && orderProperty.group > -1 ?
-                orderProperty.group : 10000;
+                orderProperty.group : lastGroupIndex;
             extendedNode.propertyIndex = orderProperty && orderProperty.prop > -1 ?
-                orderProperty.prop : 10000;
+                orderProperty.prop : lastPropertyIndex;
 
             // Mark current node to remove it later from parent node:
             deleted.push(i);
+
+            extendedNode.sc1 = checkSC1();
+
+            if (extendedNode.sc1.length) {
+                currentNode = node[i];
+                nextNode = node[i + 1];
+            }
 
             // If there is `;` right after the declaration, save it with the
             // declaration and mark it for removing from parent node:
@@ -186,13 +207,49 @@ module.exports = {
                 extendedNode.delim.push(nextNode);
                 deleted.push(i + 1);
                 i++;
+
+                if (syntax === 'sass') return extendedNode;
+
+                // Save spaces and comments which follow right after the declaration
+                // and mark them for removing from parent node:
+                extendedNode.sc2 = checkSC1();
             }
 
-            // Save spaces and comments which follow right after the declaration
-            // and mark them for removing from parent node:
-            extendedNode.sc1 = checkSC1();
-
             return extendedNode;
+        };
+
+        /**
+         * Sorts properties alphabetically.
+         *
+         * @param {Object} a First extended node
+         * @param {Object} b Second extended node
+         * @returns {Number} `-1` if properties should go in order `a, b`. `1`
+         * if properties should go in order `b, a`.
+         */
+        var sortLeftovers = function(a, b) {
+            var prefixes = ['-webkit-', '-moz-', '-ms-', '-o-', ''];
+            var prefixesRegExp = /^(-webkit-|-moz-|-ms-|-o-)(.*)$/;
+
+            // Get property name (i.e. `color`, `-o-animation`):
+            a = a.node[1][1][1];
+            b = b.node[1][1][1];
+
+            // Get prefix and unprefixed part. For example:
+            // ['-o-animation', '-o-', 'animation']
+            // ['color', '', 'color']
+            a = a.match(prefixesRegExp) || [a, '', a];
+            b = b.match(prefixesRegExp) || [b, '', b];
+
+            if (a[2] !== b[2]) {
+                // If unprefixed parts are different (i.e. `border` and
+                // `color`), compare them:
+                return a[2] < b[2] ? -1 : 1;
+            } else {
+                // If unprefixed parts are identical (i.e. `border` in
+                // `-moz-border` and `-o-border`), compare prefixes (they
+                // should go in the same order they are set in `prefixes` array):
+                return prefixes.indexOf(a[1]) < prefixes.indexOf(b[1]) ? -1 : 1;
+            }
         };
 
         // TODO: Think it through!
@@ -264,6 +321,13 @@ module.exports = {
             // list a appears after b:
             if (a.groupIndex !== b.groupIndex) return a.groupIndex - b.groupIndex;
 
+            // If a and b belong to leftovers and `sort-order-fallback` option
+            // is set to `abc`, sort properties alphabetically:
+            if (a.groupIndex === lastGroupIndex &&
+                _this.getValue('sort-order-fallback')) {
+                return sortLeftovers(a, b);
+            }
+
             // If a and b have the same group index, and a's property index is
             // higher than b's property index, in a sorted list a appears after
             // b:
@@ -283,24 +347,31 @@ module.exports = {
                 var prevNode = sorted[i - 1];
                 sc0 = currentNode.sc0;
                 var sc1 = currentNode.sc1;
+                var sc2 = currentNode.sc2;
+
+                sc0.reverse();
+                sc1.reverse();
+                sc2.reverse();
 
                 // Divide declarations from different groups with an empty line:
                 if (prevNode && currentNode.groupIndex > prevNode.groupIndex) {
                     if (sc0[0] && sc0[0][0] === 's' &&
+                       (this.syntax === 'sass' ||
                         sc0[0][1].match(/\n/g) &&
-                        sc0[0][1].match(/\n/g).length < 2) {
-                        sc0.unshift(['s', '\n']);
+                        sc0[0][1].match(/\n/g).length < 2)) {
+                        sc0[0][1] = '\n' + sc0[0][1];
                     }
                 }
 
-                sc0.reverse();
-                sc1.reverse();
-
+                for (j = 0, nl = sc2.length; j < nl; j++) {
+                    node.unshift(sc2[j]);
+                }
+                if (currentNode.delim.length > 0) node.unshift(['declDelim']);
                 for (j = 0, nl = sc1.length; j < nl; j++) {
                     node.unshift(sc1[j]);
                 }
-                if (currentNode.delim.length > 0) node.unshift(['declDelim']);
                 node.unshift(currentNode.node);
+
                 for (j = 0, nl = sc0.length; j < nl; j++) {
                     node.unshift(sc0[j]);
                 }

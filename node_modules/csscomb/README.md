@@ -1,5 +1,8 @@
 # CSScomb [![CSSComb](logo.png)](http://csscomb.com/)
-[![Build Status](https://secure.travis-ci.org/csscomb/csscomb.js.png?branch=master)](http://travis-ci.org/csscomb/csscomb.js)
+[![Build Status](https://travis-ci.org/csscomb/csscomb.js.svg?branch=master)](http://travis-ci.org/csscomb/csscomb.js)
+[![NPM version](https://badge.fury.io/js/csscomb.svg)](http://badge.fury.io/js/csscomb)
+[![Dependency Status](https://david-dm.org/csscomb/csscomb.js.svg)](https://david-dm.org/csscomb/csscomb.js)
+[![devDependency Status](https://david-dm.org/csscomb/csscomb.js/dev-status.svg)](https://david-dm.org/csscomb/csscomb.js#info=devDependencies)
 
 CSScomb is a coding style formatter for CSS.
 You can easily write your own [configuration](doc/configuration.md) to make
@@ -75,12 +78,18 @@ Please take a moment to review the [guidelines for contributing](CONTRIBUTE.md).
 Thanks for assistance and contributions:
 
 [@miripiruni](https://github.com/miripiruni),
-[@puzankov](https://github.com/puzankov),
-[@L0stSoul](https://github.com/L0stSoul),
+[@anton-rudeshko](https://github.com/anton-rudeshko),
+[@cvrebert](https://github.com/cvrebert),
+[@filtercake](https://github.com/filtercake),
 [@ignovak](https://github.com/ignovak),
 [@kizu](https://github.com/kizu),
-[@anton-rudeshko](https://github.com/anton-rudeshko),
-[@mishaberezin](https://github.com/mishaberezin)
+[@lefoy](https://github.com/lefoy),
+[@L0stSoul](https://github.com/L0stSoul),
+[@mishaberezin](https://github.com/mishaberezin),
+[@puzankov](https://github.com/puzankov),
+[@schneyra](https://github.com/schneyra),
+[@thejameskyle](https://github.com/thejameskyle),
+[@vecmezoni](https://github.com/vecmezoni)
 
 ## License
 
