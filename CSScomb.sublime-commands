@@ -1,6 +1,6 @@
 [
     {
-        "caption": "Run CSScomb JS",
+        "caption": "Run CSScomb",
         "command": "css_comb"
     }
 ]

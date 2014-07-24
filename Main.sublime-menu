@@ -6,7 +6,7 @@
         [
             {
                 "id": "css_comb_js",
-                "caption": "Run CSScomb JS",
+                "caption": "Run CSScomb",
                 "command": "css_comb"
             }
         ]
@@ -24,13 +24,13 @@
                 "children":
                 [
                     {
-                        "caption": "CSScomb JS",
+                        "caption": "CSScomb",
                         "children":
                         [
                             {
                                 "command": "open_file",
                                 "args": {
-                                    "file": "${packages}/CSScomb JS/README.md"
+                                    "file": "${packages}/CSScomb/README.md"
                                 },
                                 "caption": "README"
                             },
@@ -38,14 +38,14 @@
                             {
                                 "command": "open_file",
                                 "args": {
-                                    "file": "${packages}/CSScomb JS/CSScomb JS.sublime-settings"
+                                    "file": "${packages}/CSScomb/CSScomb.sublime-settings"
                                 },
                                 "caption": "Settings – Default"
                             },
                             {
                                 "command": "open_file",
                                 "args": {
-                                    "file": "${packages}/User/CSScomb JS.sublime-settings"
+                                    "file": "${packages}/User/CSScomb.sublime-settings"
                                 },
                                 "caption": "Settings – User"
                             },
@@ -53,7 +53,7 @@
                             {
                                 "command": "open_file",
                                 "args": {
-                                    "file": "${packages}/CSScomb JS/Default.sublime-keymap"
+                                    "file": "${packages}/CSScomb/Default.sublime-keymap"
                                 },
                                 "caption": "Key Bindings – Default"
                             },
