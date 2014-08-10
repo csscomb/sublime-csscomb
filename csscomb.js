@@ -11,14 +11,17 @@ process.stdin.on('end', function () {
     var Comb = require('./node_modules/csscomb/lib/csscomb'),
         comb = new Comb(),
         syntax = process.argv[2],
-        configPath = process.argv[3],
         config, combed;
 
-    if (configPath) {
-        config = require(configPath);
-    } else {
-        config = Comb.getConfig('csscomb');
+    try {
+        config = JSON.parse(process.argv[3]);
+    } catch (e) {
+        config = null;
     }
+
+    config = Comb.getCustomConfig() ||
+        config ||
+        Comb.getConfig('csscomb');
 
     combed = comb.configure(config).processString(str, {syntax: syntax});
     process.stdout.write(combed);

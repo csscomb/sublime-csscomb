@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import json
 import os
 import platform
 import sublime
@@ -18,14 +19,12 @@ class CssCombCommand(sublime_plugin.TextCommand):
         if not syntax:
             return
 
-        config_path = self.get_setting('custom_config_path')
-        if not config_path and self.view.file_name() != None:
-            config_path = self.get_config_path()
+        config = self.get_config()
 
         if not self.has_selection():
             region = sublime.Region(0, self.view.size())
             originalBuffer = self.view.substr(region)
-            combed = self.comb(originalBuffer, syntax, config_path)
+            combed = self.comb(originalBuffer, syntax, config)
             if combed:
                 self.view.replace(edit, region, combed)
             return
@@ -33,13 +32,14 @@ class CssCombCommand(sublime_plugin.TextCommand):
             if region.empty():
                 continue
             originalBuffer = self.view.substr(region)
-            combed = self.comb(originalBuffer, syntax, config_path)
+            combed = self.comb(originalBuffer, syntax, config)
             if combed:
                 self.view.replace(edit, region, combed)
 
-    def comb(self, css, syntax, config_path):
+    def comb(self, css, syntax, config):
+        config = json.dumps(config)
         try:
-            p = Popen(['node', COMB_PATH] + [syntax, config_path],
+            p = Popen(['node', COMB_PATH] + [syntax, config],
                 stdout=PIPE, stdin=PIPE, stderr=PIPE,
                 env=self.get_env(), shell=self.is_windows())
         except OSError:
@@ -51,21 +51,6 @@ class CssCombCommand(sublime_plugin.TextCommand):
         else:
             sublime.error_message('CSScomb error:\n%s' % stderr.decode('utf-8'))
 
-    def get_config_path(self, config_path=''):
-        if not config_path:
-            config_path = os.path.dirname(self.view.file_name()) + '/.csscomb.json'
-
-        if os.path.exists(config_path):
-            return config_path
-
-        parent_dir = os.path.dirname(config_path)
-        if os.path.dirname(config_path) in (os.path.expanduser('~'),
-                                            os.path.dirname(parent_dir)):
-            return ''
-
-        config_path = os.path.dirname(os.path.dirname(config_path)) + '/.csscomb.json'
-        return self.get_config_path(config_path)
-
     def get_env(self):
         env = None
         if self.is_osx():
@@ -73,11 +58,16 @@ class CssCombCommand(sublime_plugin.TextCommand):
             env['PATH'] += ':/usr/local/bin'
         return env
 
-    def get_setting(self, key):
+    def get_settings(self):
         settings = self.view.settings().get('CSScomb')
         if settings is None:
             settings = sublime.load_settings('CSScomb.sublime-settings')
-        return settings.get(key)
+        return settings
+
+    def get_config(self):
+        settings = self.get_settings()
+        config = settings.get('config')
+        return config
 
     def get_syntax(self):
         if self.is_css():
