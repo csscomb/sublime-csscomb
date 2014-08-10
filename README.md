@@ -13,7 +13,7 @@ You need Node.js to make this plugin work.
 ## Plugin usage
 
 Select code and press <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>c</kbd>    
-Or open "Tools" menu and select "Run CSScomb JS".
+Or open "Tools" menu and select "Run CSScomb".
 
 Tip: Combine expand selection by indentation <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>j</kbd> with <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>c</kbd> to quickly select all rules for current css selector and sort them with csscomb.
 
