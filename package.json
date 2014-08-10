@@ -1,6 +1,6 @@
 {
   "name": "sublime-csscomb",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "dependencies": {
     "csscomb": "3.0.0"
   },
