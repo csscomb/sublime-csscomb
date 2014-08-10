@@ -1,0 +1,14 @@
+CSScomb Plugin 1.0.0 Changelog:
+
+Be sure to take a look at new settings and modify them if needed.
+
+Fixes:
+ - Package name was renamed from 'CSScomb JS' to 'CSScomb'.
+
+New:
+ - You can store CSScomb's config right in your Sublime settings.
+   Open `Preferences > Package Settings > CSScomb` and see `Settings - Default`
+   for an example.
+   Note that you can still use `.csscomb.json` files inside your project
+   directory.
+
