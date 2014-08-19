@@ -97,14 +97,14 @@ class CssCombCommand(sublime_plugin.TextCommand):
         return self.view.file_name() == None and self.is_plaintext() == True
 
     def is_plaintext(self):
-        return self.view.settings().get('syntax').endswith('/Plain text.tmLanguage')
+        return self.view.scope_name(0).startswith('text.plain')
 
     def is_css(self):
-        return self.view.settings().get('syntax').endswith('/CSS.tmLanguage')
+        return self.view.scope_name(0).startswith('source.css')
 
     def is_scss(self):
-        return self.view.settings().get('syntax').endswith('/SCSS.tmLanguage')
+        return self.view.scope_name(0).startswith('source.scss')
 
     def is_less(self):
-        return self.view.settings().get('syntax').endswith('/LESS.tmLanguage')
+        return self.view.scope_name(0).startswith('source.less')
 
