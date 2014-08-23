@@ -1,3 +1,7 @@
 [
-    { "keys": ["ctrl+shift+c"], "command": "css_comb" }
+    { "keys": ["ctrl+shift+c"], "command": "css_comb", "context":
+      [
+        { "key": "selector", "operator": "regex_match", "operand": "(text\\.plain|source\\.(css|scss|less))" }
+      ]
+    }
 ]
