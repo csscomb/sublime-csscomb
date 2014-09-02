@@ -2,7 +2,7 @@
 
 ## About
 
-CSScomb is a coding style formatter for CSS.    
+CSScomb is a coding style formatter for CSS.
 You can easily write your own configuration to make your stylesheets beautiful
 and consistent.
 
@@ -26,13 +26,13 @@ project root or your `HOME` directory.
 You can read more about available options
 [in docs](https://github.com/csscomb/csscomb.js/blob/master/doc/options.md).
 
-You can also store config right in ST's settings.  
+You can also store config right in ST's settings.
 Open `Preferences > Package Settings > CSScomb` and see `Settings - Default`
 for an example.
 
 ## Issues & bugs
 
-[Plugin tracker](https://github.com/csscomb/sublime-csscomb/issues)    
+[Plugin tracker](https://github.com/csscomb/sublime-csscomb/issues)
 [CSScomb tracker](https://github.com/csscomb/csscomb.js/issues)
 
 ## Authors
