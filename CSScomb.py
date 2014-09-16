@@ -100,7 +100,8 @@ class CssCombCommand(sublime_plugin.TextCommand):
         return self.view.settings().get('syntax').endswith('/Plain text.tmLanguage')
 
     def is_css(self):
-        return self.view.settings().get('syntax').endswith('/CSS.tmLanguage')
+        return (self.view.settings().get('syntax').endswith('/CSS.tmLanguage')
+                or self.view.settings().get('syntax').endswith('/CSS3.tmLanguage'))
 
     def is_scss(self):
         return self.view.settings().get('syntax').endswith('/SCSS.tmLanguage')
