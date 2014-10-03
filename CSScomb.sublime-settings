@@ -1,4 +1,6 @@
 {
+    "node" : "/usr/local/bin",
+
     // Full list of supported options and acceptable values can be found here:
     // https://github.com/csscomb/csscomb.js/blob/master/doc/options.md
     "config": {
