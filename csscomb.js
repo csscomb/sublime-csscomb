@@ -19,6 +19,8 @@ process.stdin.on('end', function () {
         config = null;
     }
 
+    process.chdir(process.argv[4]);
+
     config = Comb.getCustomConfig() ||
         config ||
         Comb.getConfig('csscomb');

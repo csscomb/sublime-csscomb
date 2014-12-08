@@ -38,8 +38,9 @@ class CssCombCommand(sublime_plugin.TextCommand):
 
     def comb(self, css, syntax, config):
         config = json.dumps(config)
+        folder = os.path.dirname(self.view.file_name())
         try:
-            p = Popen(['node', COMB_PATH] + [syntax, config],
+            p = Popen(['node', COMB_PATH] + [syntax, config, folder],
                 stdout=PIPE, stdin=PIPE, stderr=PIPE,
                 env=self.get_env(), shell=self.is_windows())
         except OSError:
