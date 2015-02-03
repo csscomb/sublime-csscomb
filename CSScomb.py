@@ -39,9 +39,8 @@ class CssCombCommand(sublime_plugin.TextCommand):
     def comb(self, css, syntax, config):
         config = json.dumps(config)
         folder = os.path.dirname(self.view.file_name())
-        node = self.get_node()
         try:
-            p = Popen([node, COMB_PATH] + [syntax, config, folder],
+            p = Popen(['node', COMB_PATH] + [syntax, config, folder],
                 stdout=PIPE, stdin=PIPE, stderr=PIPE,
                 env=self.get_env(), shell=self.is_windows())
         except OSError:
@@ -57,8 +56,11 @@ class CssCombCommand(sublime_plugin.TextCommand):
         env = None
         if self.is_osx():
             env = os.environ.copy()
-            env['PATH'] += ':/usr/local/bin'
+            env['PATH'] += self.get_node_path()
         return env
+
+    def get_node_path(self):
+        return self.get_settings().get('node-path')
 
     def get_settings(self):
         settings = self.view.settings().get('CSScomb')
@@ -70,11 +72,6 @@ class CssCombCommand(sublime_plugin.TextCommand):
         settings = self.get_settings()
         config = settings.get('config')
         return config
-
-    def get_node(self):
-        settings = self.get_settings()
-        node = settings.get('node')
-        return node
 
     def get_syntax(self):
         if self.is_css():
