@@ -1,3 +1,5 @@
+var gonzales = require('gonzales-pe');
+
 module.exports = {
     name: 'space-after-colon',
 
@@ -13,23 +15,23 @@ module.exports = {
     /**
      * Processes tree node.
      *
-     * @param {String} nodeType
      * @param {node} node
      */
-    process: function(nodeType, node) {
-        if (nodeType !== 'declaration') return;
+    process: function(node) {
+        if (!node.is('declaration')) return;
 
         var value = this.getValue('space-after-colon');
 
         for (var i = node.length; i--;) {
-            if (node[i][0] !== 'propertyDelim') continue;
+            if (!node.get(i).is('propertyDelimiter')) continue;
 
-            if (this.getSyntax() === 'sass' && !node[i - 1]) break;
+            if (this.getSyntax() === 'sass' && !node.get(i - 1)) break;
 
             // Remove any spaces after colon:
-            if (node[i + 1][0] === 's') node.splice(i + 1, 1);
+            if (node.get(i + 1).is('space')) node.remove(i + 1);
             // If the value set in config is not empty, add spaces:
-            if (value !== '') node.splice(i + 1, 0, ['s', value]);
+            var space = gonzales.createNode({ type: 'space', content: value });
+            if (value !== '') node.insert(i + 1, space);
 
             break;
         }
@@ -38,17 +40,16 @@ module.exports = {
     /**
      * Detects the value of an option at the tree node.
      *
-     * @param {String} nodeType
      * @param {node} node
      */
-    detect: function(nodeType, node) {
-        if (nodeType !== 'declaration') return;
+    detect: function(node) {
+        if (!node.is('declaration')) return;
 
         for (var i = node.length; i--;) {
-            if (node[i][0] !== 'propertyDelim') continue;
+            if (!node.get(i).is('propertyDelimiter')) continue;
 
-            if (node[i + 1][0] === 's') {
-                return node[i + 1][1];
+            if (node.get(i + 1).is('space')) {
+                return node.get(i + 1).content;
             } else {
                 return '';
             }

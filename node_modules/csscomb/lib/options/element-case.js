@@ -7,48 +7,43 @@ module.exports = {
 
     /**
      * Processes tree node.
-     * @param {String} nodeType
      * @param {node} node
      */
-    process: function(nodeType, node) {
-        if (nodeType !== 'selector' &&
-            nodeType !== 'arguments') return;
+    process: function(node) {
+        if (!node.is('selector') &&
+            !node.is('arguments')) return;
 
-        for (var x = node.length; x--;) {
-            var selector = node[x];
-            if (selector[0] !== 'simpleselector') continue;
+        var value = this.getValue('element-case');
 
-            for (var i = selector.length; i--;) {
-                var simpleselector = selector[i];
-                if (!Array.isArray(simpleselector) ||
-                    simpleselector[0] !== 'ident') continue;
-
-                simpleselector[1] = this.getValue('element-case') === 'lower' ?
-                    simpleselector[1].toLowerCase() :
-                    simpleselector[1].toUpperCase();
-            }
-        }
+        node.forEach('simpleSelector', function(selector) {
+            selector.forEach('ident', function(ident) {
+                ident.content = value === 'lower' ?
+                    ident.content.toLowerCase() :
+                    ident.content.toUpperCase();
+            });
+        });
     },
 
     /**
      * Detects the value of an option at the tree node.
      *
-     * @param {String} nodeType
      * @param {node} node
      */
-    detect: function(nodeType, node) {
-        if (nodeType !== 'simpleselector') return;
+    detect: function(node) {
+        if (!node.is('selector') &&
+            !node.is('arguments')) return;
 
         var variants = [];
-        for (var i = node.length; i--;) {
-            var nodeItem = node[i];
-            if (nodeItem[0] !== 'ident') continue;
-            if (nodeItem[1].match(/^[a-z]+$/)) {
-                variants.push('lower');
-            } else if (nodeItem[1].match(/^[A-Z]+$/)) {
-                variants.push('upper');
-            }
-        }
+
+        node.forEach('simpleSelector', function(selector) {
+            selector.forEach('ident', function(ident) {
+                if (ident.content.match(/^[a-z]+$/)) {
+                    variants.push('lower');
+                } else if (ident.content.match(/^[A-Z]+$/)) {
+                    variants.push('upper');
+                }
+            });
+        });
         return variants;
     }
 };

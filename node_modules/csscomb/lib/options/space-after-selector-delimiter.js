@@ -1,3 +1,5 @@
+var gonzales = require('gonzales-pe');
+
 module.exports = {
     name: 'space-after-selector-delimiter',
 
@@ -13,47 +15,47 @@ module.exports = {
     /**
      * Processes tree node.
      *
-     * @param {String} nodeType
      * @param {node} node
      */
-    process: function(nodeType, node) {
-        if (nodeType !== 'selector') return;
+    process: function(node) {
+        if (!node.is('selector')) return;
 
         var value = this.getValue('space-after-selector-delimiter');
 
-        for (var i = node.length; i--;) {
-            if (node[i][0] !== 'delim') continue;
+        node.forEach('delimiter', function(delimiter, i) {
+            var nextNode = node.get(i + 1);
 
-            if (node[i + 1][0] === 's') {
-                node[i + 1][1] = value;
-            } else if (node[i + 1][1][0] === 's') {
-                node[i + 1][1][1] = value;
+            if (nextNode.is('space')) {
+                nextNode.content = value;
+            } else if (nextNode.first().is('space')) {
+                nextNode.first().content = value;
             } else {
-                node[i + 1].splice(1, 0, ['s', value]);
+                var space = gonzales.createNode({ type: 'space', content: value });
+                nextNode.insert(0, space);
             }
-        }
+        });
     },
 
     /**
      * Detects the value of an option at the tree node.
      *
-     * @param {String} nodeType
      * @param {node} node
      */
-    detect: function(nodeType, node) {
-        if (nodeType !== 'selector') return;
+    detect: function(node) {
+        if (!node.is('selector')) return;
 
         var variants = [];
 
-        for (var i = node.length; i--;) {
-            if (node[i][0] !== 'delim') continue;
-
-            if (node[i + 1][1][0] === 's') {
-                variants.push(node[i + 1][1][1]);
+        node.forEach('delimiter', function(delimiter, i) {
+            var nextNode = node.get(i + 1);
+            if (nextNode && nextNode.is('space')) {
+                variants.push(nextNode.content);
+            } else if (nextNode.first() && nextNode.first().is('space')) {
+                variants.push(nextNode.first().content);
             } else {
                 variants.push('');
             }
-        }
+        });
 
         return variants;
     }

@@ -7,33 +7,31 @@ module.exports = {
 
     /**
      * Processes tree node.
-     * @param {String} nodeType
      * @param {node} node
      */
-    process: function(nodeType, node) {
-        if (nodeType === 'number') {
-            if (this.getValue('leading-zero')) {
-                if (node[0][0] === '.')
-                    node[0] = '0' + node[0];
-            } else {
-                node[0] = node[0].replace(/^0+(?=\.)/, '');
-            }
+    process: function(node) {
+        if (!node.is('number')) return;
+
+        if (this.getValue('leading-zero')) {
+            if (node.content[0] === '.')
+                node.content = '0' + node.content;
+        } else {
+            node.content = node.content.replace(/^0+(?=\.)/, '');
         }
     },
 
     /**
      * Detects the value of an option at the tree node.
      *
-     * @param {String} nodeType
      * @param {node} node
      */
-    detect: function(nodeType, node) {
-        if (nodeType === 'number') {
-            if (node.toString().match(/^\.[0-9]+/)) {
-                return false;
-            } else if (node.toString().match(/^0\.[0-9]+/)) {
-                return true;
-            }
+    detect: function(node) {
+        if (!node.is('number')) return;
+
+        if (node.content.match(/^\.[0-9]+/)) {
+            return false;
+        } else if (node.content.match(/^0\.[0-9]+/)) {
+            return true;
         }
     }
 };

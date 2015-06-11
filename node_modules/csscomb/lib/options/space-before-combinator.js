@@ -1,3 +1,5 @@
+var gonzales = require('gonzales-pe');
+
 module.exports = {
     name: 'space-before-combinator',
 
@@ -13,50 +15,52 @@ module.exports = {
     /**
      * Processes tree node.
      *
-     * @param {String} nodeType
      * @param {node} node
      */
-    process: function(nodeType, node) {
-        if (nodeType !== 'selector') return;
+    process: function(node) {
+        if (!node.is('selector')) return;
 
         var value = this.getValue('space-before-combinator');
 
-        for (var i = node.length; i--;) {
-            var subSelector = node[i];
-            for (var j = subSelector.length; j--;) {
-                if (subSelector[j][0] !== 'combinator') continue;
-                if (subSelector[j - 1][0] === 's') {
-                    subSelector[j - 1][1] = value;
+        node.forEach(function(simpleSelector) {
+            var notFirst = false;
+
+            simpleSelector.forEach(function(n, i) {
+                if (!n.is('space') && !n.is('combinator')) notFirst = true;
+
+                // If combinator is the first thing in selector,
+                // do not add extra spaces:
+                if (!n.is('combinator') || !notFirst) return;
+
+                if (simpleSelector.get(i - 1).is('space')) {
+                    simpleSelector.get(i - 1).content = value;
                 } else {
-                    subSelector.splice(j, 0, ['s', value]);
+                    var space = gonzales.createNode({ type: 'space', content: value });
+                    simpleSelector.insert(i, space);
                 }
-            }
-        }
+            });
+        });
     },
 
     /**
      * Detects the value of an option at the tree node.
      *
-     * @param {String} nodeType
      * @param {node} node
      */
-    detect: function(nodeType, node) {
-        if (nodeType !== 'selector') return;
+    detect: function(node) {
+        if (!node.is('selector')) return;
 
         var variants = [];
 
-        for (var i = node.length; i--;) {
-            var subSelector = node[i];
-            for (var j = subSelector.length; j--;) {
-                if (subSelector[j][0] !== 'combinator') continue;
-
-                if (subSelector[j - 1][0] === 's') {
-                    variants.push(subSelector[j - 1][1]);
+        node.forEach(function(simpleSelector) {
+            simpleSelector.forEach('combinator', function(combinator, i) {
+                if (simpleSelector.get(i - 1).is('space')) {
+                    variants.push(simpleSelector.get(i - 1).content);
                 } else {
                     variants.push('');
                 }
-            }
-        }
+            });
+        });
 
         return variants;
     }

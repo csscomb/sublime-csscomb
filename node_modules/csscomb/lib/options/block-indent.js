@@ -1,21 +1,29 @@
 module.exports = (function() {
-    function processStylesheet(node) {
-        var spaces;
-        var whitespaceNode;
-        var i;
+    var syntax;
+    var value;
 
-        for (i = node.length; i--;) {
-            whitespaceNode = node[i];
+    function processNode(node, level) {
+        level = level || 0;
 
-            if (whitespaceNode[0] !== 's') continue;
+        // XXX: Hack for braces
+        if (node.is('braces') || node.is('id')) return;
 
-            spaces = whitespaceNode[1].replace(/\n[ \t]+/gm, '\n');
+        for (var i = 0; i < node.length; i++) {
+            var n = node.get(i);
+            if (!n) continue;
 
-            if (spaces === '') {
-                node.splice(i, 1);
-            } else {
-                whitespaceNode[1] = spaces;
+            if (syntax === 'sass' && n.is('block')) {
+                processSassBlock(n, level, value);
             }
+
+            // Continue only with space nodes inside {...}:
+            if (syntax !== 'sass' && level !== 0 && n.is('space')) {
+                processSpaceNode(n, level, value);
+            }
+
+            if (n.is('block') || n.is('atrulers')) level++;
+
+            processNode(n, level);
         }
     }
 
@@ -25,15 +33,15 @@ module.exports = (function() {
         var i;
 
         for (i = node.length; i--;) {
-            whitespaceNode = node[i];
+            whitespaceNode = node.get(i);
 
-            if (whitespaceNode[0] !== 's') continue;
+            if (!whitespaceNode.is('space')) continue;
 
-            if (whitespaceNode[1] === '\n') continue;
+            if (whitespaceNode.content === '\n') continue;
 
-            spaces = whitespaceNode[1].replace(/[ \t]/gm, '');
+            spaces = whitespaceNode.content.replace(/[ \t]/gm, '');
             spaces += new Array(level + 2).join(value);
-            whitespaceNode[1] = spaces;
+            whitespaceNode.content = spaces;
         }
     }
 
@@ -41,12 +49,12 @@ module.exports = (function() {
         var spaces;
 
         // Remove all whitespaces and tabs, leave only new lines:
-        spaces = node[0].replace(/[ \t]/gm, '');
+        spaces = node.content.replace(/[ \t]/gm, '');
 
         if (!spaces) return;
 
         spaces += new Array(level + 1).join(value);
-        node[0] = spaces;
+        node.content = spaces;
     }
 
     return {
@@ -64,55 +72,61 @@ module.exports = (function() {
         /**
          * Processes tree node.
          *
-         * @param {String} nodeType
          * @param {node} node
-         * @param {Number} level
          */
-        process: function process(nodeType, node, level) {
-            var syntax = this.getSyntax();
-            var value = this.getValue('block-indent');
+        process: function process(node) {
+            var spaces;
+            var whitespaceNode;
+            var i;
 
-            if (nodeType === 'stylesheet') {
-                return processStylesheet(node);
+            if (!node.is('stylesheet')) return;
+
+            syntax = this.getSyntax();
+            value = this.getValue('block-indent');
+
+
+            for (i = node.length; i--;) {
+                whitespaceNode = node.get(i);
+
+                if (!whitespaceNode.is('space')) continue;
+
+                spaces = whitespaceNode.content.replace(/\n[ \t]+/gm, '\n');
+
+                if (spaces === '') {
+                    node.remove(i);
+                } else {
+                    whitespaceNode.content = spaces;
+                }
             }
 
-            if (syntax === 'sass' && nodeType === 'block') {
-                return processSassBlock(node, level, value);
-            }
-
-            // Continue only with space nodes inside {...}:
-            if (syntax !== 'sass' && level !== 0 && nodeType === 's') {
-                processSpaceNode(node, level, value);
-            }
+            processNode(node);
         },
 
         /**
          * Detects the value of an option at the tree node.
          *
-         * @param {String} nodeType
          * @param {node} node
-         * @param {Number} level
          */
-        detect: function(nodeType, node, level) {
+        detect: function(node) {
             var result = [];
 
             // Continue only with non-empty {...} blocks:
-            if (nodeType !== 'atrulers' && nodeType !== 'block' || !node.length) return;
+            if (!node.is('atrulers') && !node.is('block') || !node.length)
+                return;
 
             for (var i = node.length; i--;) {
-                var whitespaceNode = node[i];
-                if (whitespaceNode[0] !== 's') continue;
+                var whitespaceNode = node.get(i);
+                if (!whitespaceNode.is('space')) continue;
 
-                var spaces = whitespaceNode[1];
+                var spaces = whitespaceNode.content;
                 var lastIndex = spaces.lastIndexOf('\n');
 
                 // Do not continue if there is no line break:
                 if (lastIndex < 0) continue;
 
                 // Number of spaces from beginning of line:
-                var spacesLength = spaces.slice(lastIndex + 1).length;
-                var arrayLength = Math.floor(spacesLength / (level + 1)) + 1;
-                result.push(new Array(arrayLength).join(' '));
+                var spacesLength = spaces.slice(lastIndex + 1).length + 1;
+                result.push(new Array(spacesLength).join(' '));
             }
 
             return result;
