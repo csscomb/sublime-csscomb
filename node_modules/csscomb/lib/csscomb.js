@@ -17,7 +17,7 @@ function cssToAST(text, syntax, filename) {
     var tree;
 
     try {
-        tree = gonzales.srcToAST({ syntax: syntax, src: text });
+        tree = gonzales.parse(text, { syntax: syntax });
     } catch (e) {
         throw new Error('Parsing error' + fileInfo + ': ' + e.message);
     }
@@ -56,22 +56,16 @@ function getHandler(optionName) {
  * @param {Object} detectedOptions
  */
 function detectInNode(node, level, handler, detectedOptions) {
-    node.forEach(function(node) {
-        if (!Array.isArray(node)) return;
-
-        var nodeType = node.shift();
-        var detected = handler.detect(nodeType, node, level);
+    node.map(function(tree) {
+        var detected = handler.detect(tree);
         var variants = detectedOptions[handler.name];
         if (typeof detected === 'object') {
             variants.push.apply(variants, detected);
         } else if (typeof detected !== 'undefined') {
             variants.push(detected);
         }
-        node.unshift(nodeType);
 
-        if (nodeType === 'atrulers' || nodeType === 'block') level++;
-
-        detectInNode(node, level, handler, detectedOptions);
+        //if (nodeType === 'atrulers' || nodeType === 'block') level++;
     });
 }
 
@@ -91,7 +85,7 @@ function detectInTree(tree, handlers) {
     handlers.forEach(function(handler) {
         detectedOptions[handler.name] = [];
         // TODO: Pass all parameters as one object? <tg>
-        detectInNode(['tree', tree], 0, handler, detectedOptions);
+        detectInNode(tree, 0, handler, detectedOptions);
     });
     return detectedOptions;
 }
@@ -187,26 +181,36 @@ var CSScomb = function(config) {
  */
 
 /**
- * Gets one of configuration files from `config` directory.
+ * Gets one of configuration files from configs' directory.
  *
- * @param {String} name Config's name: 'csscomb', 'zen' or 'yandex'
+ * @param {String} name Config's name, e.g. 'yandex'
  * @returns {Object} Configuration object
  */
 CSScomb.getConfig = function getConfig(name) {
-    // Names of predefined configs:
-    var CONFIGS = ['csscomb', 'zen', 'yandex'];
-    name = name || 'csscomb';
+    var DEFAULT_CONFIG_NAME = 'csscomb';
+    name = name || DEFAULT_CONFIG_NAME;
 
     if (typeof name !== 'string') {
         throw new Error('Config name must be a string.');
     }
 
-    if (CONFIGS.indexOf(name) < 0) {
+    var CONFIG_DIR_PATH = '../config';
+    var availableConfigsNames = fs.readdirSync(__dirname + '/' + CONFIG_DIR_PATH)
+        .map(function(configFileName) {
+            return configFileName.split('.')[0];  // strip file extension(s)
+        });
+
+    if (availableConfigsNames.indexOf(name) < 0) {
+        var configsNamesAsString = availableConfigsNames
+            .map(function(configName) {
+                return '\'' + configName + '\'';
+            })
+            .join(', ');
         throw new Error('"' + name + '" is not a valid config name. Try one of ' +
-            'the following: \'csscomb\', \'zen\' or \'yandex\'.');
+            'the following: ' + configsNamesAsString + '.');
     }
 
-    return require('../config/' + name + '.json');
+    return require(CONFIG_DIR_PATH + '/' + name + '.json');
 };
 
 /**
@@ -221,7 +225,7 @@ CSScomb.getCustomConfig = function getCustomConfig(configPath) {
     configPath = configPath || CSScomb.getCustomConfigPath();
 
     try {
-        config = require(configPath);
+        config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
     } catch (e) {
         config = null;
     }
@@ -243,7 +247,7 @@ CSScomb.getCustomConfigPath = function getCustomConfigPath(configPath) {
     configPath = configPath || path.join(process.cwd(), '.csscomb.json');
 
     // If we've finally found a config, return its path:
-    if (fs.existsSync(configPath)) return configPath;
+    if (fs.existsSync(configPath)) return fs.realpathSync(configPath);
 
     // If we are in HOME dir already and yet no config file, return a default
     // one from our package.

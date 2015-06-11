@@ -7,40 +7,39 @@ module.exports = {
 
     /**
      * Processes tree node.
-     * @param {String} nodeType
      * @param {node} node
      */
-    process: function(nodeType, node) {
-        var value = this.getValue('quotes');
-        if (nodeType === 'string') {
-            if (node[0][0] === '"' && value === 'single') {
-                node[0] = node[0]
-                    .replace(/\\"/g, '"') // unescape all escaped double quotes
-                    .replace(/([^\\])'/g, '$1\\\'') // escape all the single quotes
-                    .replace(/^"|"$/g, '\''); // replace the first and the last quote
+    process: function(node) {
+        if (!node.is('string')) return;
 
-            } else if (node[0][0] === '\'' && value === 'double') {
-                node[0] = node[0]
-                    .replace(/\\'/g, '\'') // unescape all escaped single quotes
-                    .replace(/([^\\])"/g, '$1\\\"') // escape all the double quotes
-                    .replace(/^'|'$/g, '"'); // replace the first and the last quote
-            }
+        var value = this.getValue('quotes');
+
+        if (node.content[0] === '"' && value === 'single') {
+            node.content = node.content
+                .replace(/\\"/g, '"') // unescape all escaped double quotes
+                .replace(/([^\\])'/g, '$1\\\'') // escape all the single quotes
+                .replace(/^"|"$/g, '\''); // replace the first and the last quote
+
+        } else if (node.content[0] === '\'' && value === 'double') {
+            node.content = node.content
+                .replace(/\\'/g, '\'') // unescape all escaped single quotes
+                .replace(/([^\\])"/g, '$1\\\"') // escape all the double quotes
+                .replace(/^'|'$/g, '"'); // replace the first and the last quote
         }
     },
 
     /**
      * Detects the value of an option at the tree node.
      *
-     * @param {String} nodeType
      * @param {node} node
      */
-    detect: function(nodeType, node) {
-        if (nodeType === 'string') {
-            if (node[0][0] === '"') {
-                return 'double';
-            } else if (node[0][0] === '\'') {
-                return 'single';
-            }
+    detect: function(node) {
+        if (!node.is('string')) return;
+
+        if (node.content[0] === '"') {
+            return 'double';
+        } else if (node.content[0] === '\'') {
+            return 'single';
         }
     }
 };

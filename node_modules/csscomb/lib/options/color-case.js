@@ -7,33 +7,28 @@ module.exports = {
 
     /**
      * Processes tree node.
-     * @param {String} nodeType
      * @param {node} node
      */
-    process: function(nodeType, node) {
-        var value = this.getValue('color-case');
-        if (nodeType === 'vhash') {
-            if (value === 'lower') {
-                node[0] = node[0].toLowerCase();
-            } else if (value === 'upper') {
-                node[0] = node[0].toUpperCase();
-            }
-        }
+    process: function(node) {
+        if (!node.is('color')) return;
+
+        node.content = this.getValue('color-case') === 'lower' ?
+            node.content.toLowerCase() :
+            node.content.toUpperCase();
     },
 
     /**
      * Detects the value of an option at the tree node.
      *
-     * @param {String} nodeType
      * @param {node} node
      */
-    detect: function(nodeType, node) {
-        if (nodeType === 'vhash') {
-            if (node[0].match(/^[^A-F]*[a-f][^A-F]*$/)) {
-                return 'lower';
-            } else if (node[0].match(/^[^a-f]*[A-F][^a-f]*$/)) {
-                return 'upper';
-            }
+    detect: function(node) {
+        if (!node.is('color')) return;
+
+        if (node.content.match(/^[^A-F]*[a-f][^A-F]*$/)) {
+            return 'lower';
+        } else if (node.content.match(/^[^a-f]*[A-F][^a-f]*$/)) {
+            return 'upper';
         }
     }
 };

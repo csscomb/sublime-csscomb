@@ -27,6 +27,8 @@ module.exports = {
     Semicolon: 'Semicolon',                     // ;
     LessThanSign: 'LessThanSign',               // <
     EqualsSign: 'EqualsSign',                   // =
+    EqualitySign: 'EqualitySign',               // ==
+    InequalitySign: 'InequalitySign',           // !=
     GreaterThanSign: 'GreaterThanSign',         // >
     QuestionMark: 'QuestionMark',               // ?
     CommercialAt: 'CommercialAt',               // @

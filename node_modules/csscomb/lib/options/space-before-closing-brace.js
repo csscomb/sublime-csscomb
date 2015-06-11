@@ -1,12 +1,57 @@
-module.exports = (function() {
-    function getLastWhitespaceNode(node) {
-        var lastNode = node[node.length - 1];
+var gonzales = require('gonzales-pe');
 
-        if (typeof lastNode !== 'object' || lastNode[0] === 'block') return null;
-        if (lastNode[0] === 's') return lastNode;
+module.exports = (function() {
+    var valueFromSettings;
+    var blockIndent;
+
+    function getLastWhitespaceNode(node) {
+        var lastNode = node.last();
+
+        if (!lastNode || !lastNode.content) return null;
+
+        if (lastNode.is('block')) return null;
+        if (lastNode.is('space')) return lastNode;
 
         return getLastWhitespaceNode(lastNode);
     }
+
+    function processBlock(x, level) {
+        level = level || 0;
+
+        // XXX: Hack for braces
+        if (x.is('braces') || x.is('id')) return;
+
+        x.forEach(function(node) {
+            if (!node.is('block') &&
+                !node.is('atrulers')) return processBlock(node, level);
+
+            level++;
+
+            var value = valueFromSettings;
+            if (value.indexOf('\n') > -1) {
+                // TODO: Check that it works for '' block indent value <tg>
+                if (blockIndent) {
+                    value += new Array(level).join(blockIndent);
+                }
+            }
+
+            // If found block node stop at the next one for space check
+            // For the pre-block node, find its last (the deepest) child
+            var whitespaceNode = getLastWhitespaceNode(node);
+
+            // If it's spaces, modify this node
+            // If it's something different from spaces, add a space node to the end
+            if (whitespaceNode) {
+                whitespaceNode.content = value;
+            } else if (value !== '') {
+                var space = gonzales.createNode({ type: 'space', content: value });
+                node.content.push(space);
+            }
+
+            processBlock(node, level);
+        });
+    }
+
 
     return {
         name: 'space-before-closing-brace',
@@ -22,57 +67,33 @@ module.exports = (function() {
 
         /**
          * Processes tree node.
-         * @param {String} nodeType
          * @param {node} node
-         * @param {Number} level
          */
-        process: function(nodeType, node, level) {
-            if (nodeType !== 'block' && nodeType !== 'atrulers') return;
+        process: function(node) {
+            valueFromSettings = this.getValue('space-before-closing-brace');
+            blockIndent = this.getValue('block-indent');
 
-            var value = this.getValue('space-before-closing-brace');
+            if (!node.is('stylesheet')) return;
 
-            // If found block node stop at the next one for space check
-            // For the pre-block node, find its last (the deepest) child
-            var whitespaceNode = getLastWhitespaceNode(node);
-
-            if (value.indexOf('\n') > -1) {
-                var blockIndent = this.getValue('block-indent');
-                // TODO: Check that it works for '' block indent value <tg>
-                if (blockIndent) value += new Array(level + 1).join(blockIndent);
-            }
-
-            // If it's spaces, modify this node
-            // If it's something different from spaces, add a space node to the end
-
-            if (whitespaceNode) {
-                whitespaceNode[1] = value;
-            } else if (value !== '') {
-                node.push(['s', value]);
-            }
+            processBlock(node);
         },
 
         /**
          * Detects the value of an option at the tree node.
          *
-         * @param {String} nodeType
          * @param {node} node
          */
-        detect: function(nodeType, node) {
+        detect: function(node) {
+            if (!node.is('block') && !node.is('atrulers')) return;
+
             var variants = [];
 
-            // Loop through node from the end to the beginning:
-            for (var i = node.length; i--;) {
-                // If found block node stop for space check:
-                if (node[i][0] !== 'block' && node[i][0] !== 'atrulers') continue;
-
-                // For the block node, find its last (the deepest) child
-                var whitespaceNode = getLastWhitespaceNode(node[i]);
-
-                if (whitespaceNode) {
-                    variants.push(whitespaceNode[1]);
-                } else {
-                    variants.push('');
-                }
+            // For the block node, find its last (the deepest) child
+            var whitespaceNode = getLastWhitespaceNode(node);
+            if (whitespaceNode) {
+                variants.push(whitespaceNode.content);
+            } else {
+                variants.push('');
             }
 
             return variants;

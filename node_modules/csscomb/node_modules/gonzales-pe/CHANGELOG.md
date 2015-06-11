@@ -1,6 +1,38 @@
 Gonzales changelog
 ==================
 
+xx.xx.201x, Version 3.0.0
+-------------------------
+
+AST:
+    - Rename `interpolatedVariable` to `interpolation`
+    - Rename `functionBody` to `arguments`
+    - New node type `conditionalStatement`
+    - Remove unused node types
+
+Parsing rules:
+    - Interpolations are ok as arguments, inside nth selector and within identifiers
+    - Functions are ok as arguments
+    - Spaces are optional after declDelim
+    - Check for unary operator in arguments
+    - Parse operators inside arguments (#16)
+    - Remove spaces from the end of includes
+    - Every argument can be escaped string
+    - Braces around arguments are ok
+    - Equality and inequality signs are ok as operators
+
+API:
+    - srcToAST({src: 'string', syntax: 'css', needInfo: true, rule: 'stylesheet'})
+    - astToSrc()
+    - astToString()
+
+Tests:
+    - Add more tests
+    - Place test files inside rule directory
+    - Use 'min' reporter instead of 'spec'
+    - Add Travis config
+    - Divide log and test scripts
+
 29.12.2013, Version 2.0.2
 -------------------------
 

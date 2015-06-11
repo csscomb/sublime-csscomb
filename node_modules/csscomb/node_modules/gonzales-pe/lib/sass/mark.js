@@ -145,6 +145,7 @@ module.exports = (function() {
             prevIL = currentIL;
             if (tokens[i].type === TokenType.Newline) continue;
             else if (tokens[i].type === TokenType.Space &&
+                     tokens[i + 1] &&
                      tokens[i + 1].type === TokenType.Newline) continue;
             else if (tokens[i].type !== TokenType.Space) currentIL = 0;
             else {
