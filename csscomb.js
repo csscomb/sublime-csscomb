@@ -11,7 +11,7 @@ process.stdin.on('end', function () {
     var Comb = require('./node_modules/csscomb/lib/csscomb'),
         comb = new Comb(),
         syntax = process.argv[2],
-        config, combed;
+        config, promise;
 
     try {
         config = JSON.parse(process.argv[3]);
@@ -25,7 +25,10 @@ process.stdin.on('end', function () {
         config ||
         Comb.getConfig('csscomb');
 
-    combed = comb.configure(config).processString(str, {syntax: syntax});
-    process.stdout.write(combed);
+    promise = comb.configure(config).processString(str, {syntax: syntax});
+
+    promise.then(function(string) {
+        process.stdout.write(string);
+    })
 });
 
