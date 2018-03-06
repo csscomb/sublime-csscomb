@@ -29,6 +29,8 @@ process.stdin.on('end', function () {
 
     promise.then(function(string) {
         process.stdout.write(string);
+    }).catch(function(error) {
+        process.stderr.write(error.stack);
     })
 });
 
