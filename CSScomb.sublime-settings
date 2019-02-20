@@ -3,6 +3,9 @@
     // to your `node` bin
     "node-path" : ":/usr/local/bin",
 
+    // If you want to run CSScomb on save
+    "on-save" : false,
+
     // Full list of supported options and acceptable values can be found here:
     // https://github.com/csscomb/csscomb.js/blob/master/doc/options.md
     "config": {
